@@ -1,5 +1,4 @@
 *token.txt
 *.pt
 test_img
-model
-tokenizer
+*.bin

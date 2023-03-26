@@ -100,11 +100,11 @@ class Generator():
         return self.split_paragraphs(text)
         
     # достаем картинку по запросу
-    def get_image(self, image_text):
+    def get_image(self, image_text, prev):
         search = self.unspl.search(type_='photos', per_page=50, query=image_text)
         # мы не хотим, чтобы картинки повторялись
         for entry in search.entries:
-            if entry.id not in self.prev['image'].unique():
+            if entry.id not in prev.unique():
                 image = Image.open(BytesIO(requests.get(entry.link_download).content))
                 return image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width))), entry.id
         return
@@ -121,7 +121,7 @@ class Generator():
                 break
 
         print('generating image')
-        image, image_id = self.get_image(text)
+        image, image_id = self.get_image(text, prev['image'])
         if not image:
             self.generate()
 

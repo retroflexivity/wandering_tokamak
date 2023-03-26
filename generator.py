@@ -1,6 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from numpy.random import choice
-from numpy import array
 import torch
 import torch.nn.functional as F
 import pandas as pd
@@ -105,7 +104,7 @@ class Generator():
         search = self.unspl.search(type_='photos', per_page=50, query=image_text)
         # мы не хотим, чтобы картинки повторялись
         for entry in search.entries:
-            if entry.id not in prev['image'].unique():
+            if entry.id not in self.prev['image'].unique():
                 image = Image.open(BytesIO(requests.get(entry.link_download).content))
                 return image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width))), entry.id
         return
@@ -125,12 +124,14 @@ class Generator():
         image, image_id = self.get_image(text)
         if not image:
             self.generate()
-    
+
+        # добавляем текст и картинку в список баянов    
         pd.concat((
             prev, 
             pd.DataFrame({'text': [text[:20]], 'image': [image_id]}
                         ))).to_csv('bayan.csv', index=False)
 
+        # рисуем
         image_height = image.size[1]
 
         draw = ImageDraw.Draw(image)

@@ -6,7 +6,7 @@ import threading
 from generator import Generator
 
 
-token = open('tgbot_token.txt').read()
+token = open('tgbot_token.txt').read().strip()
 
 # вот этот — https://t.me/wandering_tokamak
 chat_id = '@wandering_tokamak'

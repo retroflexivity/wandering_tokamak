@@ -107,7 +107,8 @@ class Generator():
         for entry in search.entries:
             if entry.id not in prev['image'].unique():
                 image = Image.open(BytesIO(requests.get(entry.link_download).content))
-                return image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width)))        
+                return image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width))), entry.id
+        return
 
     # генерируем
     def generate(self):
@@ -121,7 +122,9 @@ class Generator():
                 break
 
         print('generating image')
-        image_id, image = self.get_image(text)
+        image, image_id = self.get_image(text)
+        if not image:
+            self.generate()
     
         pd.concat((
             prev, 

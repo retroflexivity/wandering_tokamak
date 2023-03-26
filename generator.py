@@ -103,29 +103,30 @@ class Generator():
     # достаем картинку по запросу
     def get_image(self, image_text):
         search = self.unspl.search(type_='photos', per_page=50, query=image_text)
-        entry = next(search.entries)
-        image = Image.open(BytesIO(requests.get(entry.link_download).content))
-        return entry.id, image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width)))
+        # мы не хотим, чтобы картинки повторялись
+        for entry in search.entries:
+            if entry.id not in prev['image'].unique():
+                image = Image.open(BytesIO(requests.get(entry.link_download).content))
+                return image.resize((self.image_width, round(image.size[1] / image.size[0] * self.image_width)))        
 
     # генерируем
     def generate(self):
-        # мы не хотим, чтобы тексты или картинки повторялись
+        # мы не хотим, чтобы тексты повторялись
         prev = pd.read_csv('bayan.csv')
 
         print('generating text')
-        text = self.generate_text()
-        
+        while True:
+            text = self.generate_text()
+            if text[:20] not in prev['text'].unique():
+                break
+
         print('generating image')
         image_id, image = self.get_image(text)
     
-        if (text[:20] in prev['text'].unique()) or (image_id in prev['image'].unique()):
-            print('duplicate!')
-            return self.generate()
-        else:
-            pd.concat((
-                prev, 
-                pd.DataFrame({'text': [text[:20]], 'image': [image_id]}
-                ))).to_csv('bayan.csv', index=False)
+        pd.concat((
+            prev, 
+            pd.DataFrame({'text': [text[:20]], 'image': [image_id]}
+                        ))).to_csv('bayan.csv', index=False)
 
         image_height = image.size[1]
 

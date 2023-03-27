@@ -90,11 +90,11 @@ class Generator():
         return '\n'.join(paragraphs)[1:]
 
     # генерация текста вообще
-    def generate_text(self):
-        text = self.gptate(model.to('cpu'), tokenizer, ' ').upper()
+    def generate_text(self, prompt=' '):
+        text = self.gptate(model.to('cpu'), tokenizer, prompt).upper()
         try:
             # обрезаем до последнего законченного
-            text = text['''text.index(' ') + 1''':text.rindex('.')]
+            text = text[:text.rindex('.')]
         except:
             pass
         return self.split_paragraphs(text)

@@ -33,6 +33,6 @@ def send_to_channel():
     
     # спим...
     print('sleeping...')
-    threading.Timer(3600.0, send_to_channel).start()
+    threading.Timer(10.0, send_to_channel).start()
 
 send_to_channel()
